@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "sonner";
+import Link from "next/link";
+import { Notebook } from "lucide-react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +30,33 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <header className="z-50">
+          <nav
+            aria-label="Global"
+            className="flex items-center justify-between p-6 lg:px-8"
+          >
+            <div className="flex lg:flex-1">
+              <Link
+                href="/"
+                className="text-sm/6 font-semibold text-gray-900 flex items-center gap-1"
+              >
+                <Notebook className="w-4 h-4" />
+                NoteMind
+              </Link>
+            </div>
+
+            <div className="flex flex-1 justify-end">
+              <Link
+                href="/notes"
+                className="text-sm/6 font-semibold text-gray-900"
+              >
+                View Notes <span aria-hidden="true">&rarr;</span>
+              </Link>
+            </div>
+          </nav>
+        </header>
         {children}
+        <Toaster />
       </body>
     </html>
   );
