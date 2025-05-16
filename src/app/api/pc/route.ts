@@ -17,11 +17,9 @@ export async function POST(req: Request) {
     value: text,
   });
 
-  // Second stage: Upsert to Pinecone (simulate with delay)
-
   const queryResponse = await index.namespace("notes").upsert([
     {
-      id: crypto.randomUUID(), // Generate a unique ID for each note
+      id: crypto.randomUUID(),
       values: embedding,
       metadata: { content: text },
     },

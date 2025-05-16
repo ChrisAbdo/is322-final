@@ -9,7 +9,8 @@ export async function GET(request: Request) {
     }
 
     // Use a default voice ID (Rachel)
-    const voiceId = "21m00Tcm4TlvDq8ikWAM";
+    const voiceId = "G17SuINrv2H9FC6nvetn";
+    // sk_0ecbd4222e94c1e39361baa9b58a44d89137230c8f87d20f
     const apiKey = "sk_7555d6f1677c0be91d5ca7c565629ed3c53a700e514d5c62";
 
     // Make a direct API call to ElevenLabs
@@ -34,6 +35,8 @@ export async function GET(request: Request) {
     );
 
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error("ElevenLabs API error details:", errorText);
       throw new Error(
         `ElevenLabs API error: ${response.status} ${response.statusText}`
       );

@@ -1,13 +1,14 @@
 "use client";
 
 import { Mic } from "lucide-react";
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { Textarea } from "./ui/textarea";
 
 interface AIVoiceInputProps {
   onStart?: () => void;
@@ -26,6 +27,7 @@ export function AIVoiceInput({
   const [isClient, setIsClient] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [editableTranscript, setEditableTranscript] = useState("");
 
   const {
     transcript,
@@ -61,6 +63,12 @@ export function AIVoiceInput({
     };
   }, [listening, onStart, onStop, time, transcript]);
 
+  useEffect(() => {
+    if (transcript) {
+      setEditableTranscript(transcript);
+    }
+  }, [transcript]);
+
   const formatTime = useCallback((seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -74,13 +82,14 @@ export function AIVoiceInput({
       SpeechRecognition.stopListening();
     } else {
       resetTranscript();
+      setEditableTranscript("");
       setSubmitSuccess(false);
       SpeechRecognition.startListening({ continuous: true });
     }
   }, [listening, resetTranscript]);
 
   const handleConfirm = () => {
-    if (!transcript) return;
+    if (!editableTranscript) return;
 
     setIsSubmitting(true);
 
@@ -92,7 +101,7 @@ export function AIVoiceInput({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ text: transcript }),
+        body: JSON.stringify({ text: editableTranscript }),
       })
         .then(() => {
           // Simulate a delay to show the loading state
@@ -100,6 +109,7 @@ export function AIVoiceInput({
             resolve({ success: true });
             setSubmitSuccess(true);
             resetTranscript();
+            setEditableTranscript("");
             setIsSubmitting(false);
           }, 1000);
         })
@@ -189,9 +199,14 @@ export function AIVoiceInput({
 
         {transcript && (
           <div className="mt-4 p-3 bg-gray-100 dark:bg-gray-800 rounded-lg w-full max-h-40 overflow-y-auto">
-            <p className="text-sm text-black/80 dark:text-white/80">
-              {transcript}
-            </p>
+            <Textarea
+              className="min-h-[80px] text-sm text-black/80 dark:text-white/80 w-full"
+              value={editableTranscript}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                setEditableTranscript(e.target.value)
+              }
+              placeholder="Edit your transcription here..."
+            />
 
             {submitSuccess ? (
               <p className="text-green-500 text-sm mt-2">

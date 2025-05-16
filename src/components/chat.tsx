@@ -5,6 +5,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AIVoiceInput } from "./ai-voice-input";
 import { VoiceChat } from "./voice-chat";
 import { speak } from "@/lib/tts-utils";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { ChevronDown } from "lucide-react";
 
 interface Message {
   role: "user" | "assistant";
@@ -134,7 +140,7 @@ export default function Chat() {
               }`}
             >
               <p className="text-sm font-semibold mb-1">
-                {message.role === "user" ? "You" : "DocMind AI"}
+                {message.role === "user" ? "You" : "NoteMind AI"}
               </p>
               <div className="whitespace-pre-wrap">
                 {typeof message.content === "string"
@@ -145,9 +151,9 @@ export default function Chat() {
           ))
         )}
 
-        {isLoading && (
+        {isLoading && !isSpeaking && (
           <div className="p-4 rounded-lg bg-gray-100 mr-auto max-w-[80%]">
-            <p className="text-sm font-semibold mb-1">DocMind AI</p>
+            <p className="text-sm font-semibold mb-1">NoteMind AI</p>
             <div className="flex space-x-2">
               <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
               <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce [animation-delay:0.2s]" />
@@ -171,28 +177,33 @@ export default function Chat() {
       </div>
 
       {sources.length > 0 && (
-        <div className="mb-4">
-          <h3 className="text-sm font-semibold mb-2">Sources:</h3>
-          <div className="max-h-40 overflow-y-auto bg-gray-50 p-2 rounded-lg">
-            {sources.map((source, index) => (
-              <div key={index} className="text-xs mb-2 p-2 bg-white rounded">
-                <div className="font-medium">
-                  {typeof source.content === "string"
-                    ? source.content.length > 100
-                      ? `${source.content.substring(0, 100)}...`
-                      : source.content
-                    : "Invalid source content"}
+        <Collapsible className="mb-4">
+          <CollapsibleTrigger className="flex items-center text-sm font-semibold mb-2">
+            <span>Sources:</span>
+            <ChevronDown className="h-4 w-4 ml-1" />
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="max-h-40 overflow-y-auto bg-gray-50 p-2 rounded-lg">
+              {sources.map((source, index) => (
+                <div key={index} className="text-xs mb-2 p-2 bg-white rounded">
+                  <div className="font-medium">
+                    {typeof source.content === "string"
+                      ? source.content.length > 100
+                        ? `${source.content.substring(0, 100)}...`
+                        : source.content
+                      : "Invalid source content"}
+                  </div>
+                  <div className="text-gray-500 mt-1">
+                    Relevance:{" "}
+                    {typeof source.score === "number"
+                      ? `${(source.score * 100).toFixed(2)}%`
+                      : "N/A"}
+                  </div>
                 </div>
-                <div className="text-gray-500 mt-1">
-                  Relevance:{" "}
-                  {typeof source.score === "number"
-                    ? `${(source.score * 100).toFixed(2)}%`
-                    : "N/A"}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+              ))}
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
       )}
 
       <Tabs defaultValue="voice" className="w-[400px]">
